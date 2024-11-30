@@ -1,12 +1,12 @@
-const apiKey = "e6196781453b20093c744c7e5848630d";
+const apiKey = "6427275c4ee8b157888fdf144b2fc5ca";
 
-// const locationExample = {
-//   name: "Springfield",
-//   lat: 38.7780946,
-//   lon: -77.1807462,
-//   country: "US",
-//   state: "Virginia",
-// };
+const locationExample = {
+  name: "Springfield",
+  lat: 38.7780946,
+  lon: -77.1807462,
+  country: "US",
+  state: "Virginia",
+};
 
 const todayExample = {
   coord: {
@@ -1061,8 +1061,6 @@ const limit = `&limit=1`;
 const todayURL = `https://api.openweathermap.org/data/2.5/weather?q=${city},${state},${country}${limit}&appid=${apiKey}`;
 // replace the search query with ${query}
 
-// const geoLocationURL = `http://api.openweathermap.org/geo/1.0/direct?q=${city},${state},${country}${limit}&appid=${apiKey}`;
-
 // let lat = locationExample.lat;
 // let long = locationExample.lon;
 
@@ -1108,14 +1106,6 @@ const getDayData = (day) => {
   // 32-39 = day5
 };
 
-// const getAllTemps2 = (fiveDayData) => {
-//   array = [];
-//   fiveDayData.list.forEach((dt) => array.push(dt.main.temp));
-//   return array;
-// };
-
-// const allTemps2 = getAllTemps2(fiveDayExample);
-
 // const timestamp = fiveDayExample.list[0].dt; // Unix timestamp in seconds
 // const date = new Date(timestamp * 1000); // Convert to milliseconds
 // console.log(date.toUTCString()); // Outputs date in UTC format
@@ -1125,7 +1115,7 @@ const fetchNow = () => {
   const query = document.querySelector("#query").value.replace(/\s+/g, "%20");
 
   console.log(query);
-  const url = `https://api.openweathermap.org/data/2.5/weather?q=${query}${limit}&appid=${apiKey}&units=imperial`;
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${query}$&limit=1&appid=${apiKey}&units=imperial`;
   console.log(url);
 
   fetch(url, {
@@ -1157,9 +1147,104 @@ const addNow = (data) => {
   nowSection.insertAdjacentHTML("beforeend", template);
 };
 
-const fetchFiveDay = () => {
-  const weatherFiveDayURL = `api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${long}&appid=${apiKey}&units=imperial`;
-};
+async function fetchFiveDay() {
+  // let lon;
+  // let lat;
+
+  async function fetchCoordinates() {
+    const query = document.querySelector("#query").value.replace(/\s+/g, "%20");
+
+    const coordinatesCall = await fetch(
+      `http://api.openweathermap.org/geo/1.0/direct?q=${query}&limit=1&appid=${apiKey}
+      `,
+      {
+        method: "GET",
+        dataType: "json",
+      }
+    );
+
+    console.log(coordinatesCall);
+
+    const coordinatesArray = await coordinatesCall.json();
+    const coordinates = await coordinatesArray[0];
+    // lat = await coordinates.lat;
+    // lon = await coordinates.lon;
+
+    // const result = await {
+    //   lon: coordinates.lon,
+    //   lat: coordinates.lat,
+    // }
+
+    console.log(coordinates);
+
+    return coordinates;
+  }
+
+  async function getFiveDayData(coordinates) {
+    const fiveDayURL = `api.openweathermap.org/data/2.5/forecast?lat=${coordinates.lat}&lon=${coordinates.lon}&appid=${apiKey}`;
+
+    console.log(fiveDayURL);
+
+    const fetchFiveDay = await fetch(fiveDayURL, {
+      method: "GET",
+      dataType: "json",
+    });
+
+    const fiveDayData = await fetchFiveDay.json();
+
+    console.log(fiveDayData);
+  }
+
+  // try {
+  //   const data = await fetchData(); // fetch coordinates funciton called
+
+  //   const step1Result = await processStep1(data); // fetch five day data funciton falled
+
+  //   const step2Result = await processStep2(step1Result); // update templates function called
+
+  //   console.log(step2Result);
+  // } catch (error) {
+  //   console.error("Error processing data:", error);
+  // }
+
+  try {
+    const coordinates = await fetchCoordinates();
+
+    const fiveDayData = await getFiveDayData(coordinates);
+
+    // lon = coordinates.lon
+    // lat = coordinates.lat
+
+    // const fetchLongAndLat = await (query) => {
+    //   const geoLocationURL = `http://api.openweathermap.org/geo/1.0/direct?q=${query}${limit}&appid=${apiKey}`;
+
+    //   console.log(geoLocationURL);
+
+    //   // need to fetch the longituted and latitude from the query
+
+    //   fetch(geoLocationURL, {
+    //     method: "Get",
+    //     dataType: "json",
+    //   })
+    //     .then((data) => data.json())
+    //     .then(() => {
+    //       lon = data.lon;
+    //       lat = data.lat;
+    //     });
+    // };
+
+    // with that info ineed to construc the fiveDay fetch URL
+
+    // const fiveDayData = await fiveDayCall.json();
+
+    console.log(fiveDayData);
+  } catch (error) {
+    console.error("Error processing data:", error);
+  }
+}
 
 const searchButton = document.querySelector(".search");
-searchButton.addEventListener("click", () => fetchNow());
+searchButton.addEventListener("click", () => {
+  fetchNow();
+  fetchFiveDay();
+});
