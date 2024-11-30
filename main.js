@@ -1155,15 +1155,13 @@ async function fetchFiveDay() {
     const query = document.querySelector("#query").value.replace(/\s+/g, "%20");
 
     const coordinatesCall = await fetch(
-      `http://api.openweathermap.org/geo/1.0/direct?q=${query}&limit=1&appid=${apiKey}
+      `https://api.openweathermap.org/geo/1.0/direct?q=${query}&limit=1&appid=${apiKey}
       `,
       {
         method: "GET",
         dataType: "json",
       }
     );
-
-    console.log(coordinatesCall);
 
     const coordinatesArray = await coordinatesCall.json();
     const coordinates = await coordinatesArray[0];
@@ -1175,15 +1173,15 @@ async function fetchFiveDay() {
     //   lat: coordinates.lat,
     // }
 
-    console.log(coordinates);
+    console.log("Coordinates:", coordinates);
 
     return coordinates;
   }
 
   async function getFiveDayData(coordinates) {
-    const fiveDayURL = `api.openweathermap.org/data/2.5/forecast?lat=${coordinates.lat}&lon=${coordinates.lon}&appid=${apiKey}`;
+    const fiveDayURL = `https://api.openweathermap.org/data/2.5/forecast?lat=${coordinates.lat}&lon=${coordinates.lon}&appid=${apiKey}`;
 
-    console.log(fiveDayURL);
+    console.log("Five Day URL:", fiveDayURL);
 
     const fetchFiveDay = await fetch(fiveDayURL, {
       method: "GET",
@@ -1192,7 +1190,9 @@ async function fetchFiveDay() {
 
     const fiveDayData = await fetchFiveDay.json();
 
-    console.log(fiveDayData);
+    console.log("Five Day Data:", fiveDayData);
+
+    return fiveDayData;
   }
 
   // try {
@@ -1236,8 +1236,6 @@ async function fetchFiveDay() {
     // with that info ineed to construc the fiveDay fetch URL
 
     // const fiveDayData = await fiveDayCall.json();
-
-    console.log(fiveDayData);
   } catch (error) {
     console.error("Error processing data:", error);
   }
