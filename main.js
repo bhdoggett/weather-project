@@ -1,6 +1,6 @@
-import { WEATHER_API_KEY } from "./key.js";
+// import { WEATHER_API_KEY } from "./key.js";
 
-const apiKey = WEATHER_API_KEY;
+const apiKey = "6427275c4ee8b157888fdf144b2fc5ca";
 const units = "imperial";
 
 const fetchNow = () => {
@@ -81,15 +81,25 @@ async function fetchFiveDay() {
   async function addFiveDayForecast(data) {
     // create an array for each of the five days
 
-    const dividedDayData = [[], [], [], [], []];
+    const dividedDayData = [
+      { avgTemp: 70, mostComonIcon: "10d" },
+      [],
+      [],
+      [],
+      [],
+    ];
 
     // process information in each array to produce the correct temperature estimate and the most commonly listed icon code. This information could be stored in an object that summarizes the information. this would make it easier to reference in the html tempalate.
 
     // update html template with each day's information
 
     function processDayData(day) {
-      const dayData = [];
+      const dayData = {};
       let indexRange = [];
+      let tempAcc = 0;
+      let iconOccurances = {};
+      let weatherDescriptionOccurances = {};
+
       if (day === 1) {
         indexRange = [0, 7];
       }
@@ -107,45 +117,56 @@ async function fetchFiveDay() {
       }
 
       for (let i = indexRange[0]; i <= indexRange[1]; i++) {
-        data.list[i];
-        dayData.push(data.list[i]);
+        // console.log(data.list[i]);
+        const time = data.list[i];
+        console.log("Temp:", time.main.temp);
+        tempAcc += time.main.temp;
+
+        console.log(time.weather[0].main);
+        if (iconOccurances.hasOwnProperty(time.weather.main)) {
+          iconOccurances[time.weather[0].main]++;
+        } else {
+          iconOccurances[time.weather[0].main] = 1;
+        }
       }
+
+      const tempAvg = tempAcc / 8;
+      console.log("temp avg:", tempAvg);
+      // dayData.push()
+      // console.log(`Day ${day}:`, dayData);
+      console.log("Icon Occurances:", iconOccurances);
 
       dividedDayData.push(dayData);
     }
 
-    processDayData(1);
-    processDayData(2);
-    processDayData(3);
-    processDayData(4);
-    processDayData(5);
+    for (let i = 1; i <= 5; i++) {
+      processDayData(i);
+    }
 
-    console.log(day1);
-
-    const daySummary = (dayNum) => {
-      const day = processDayData(dayNum);
-      console.log(`Day${dayNum} data:`, day);
-      const allTemps = [];
-      const allIcons = [];
-      const allWeatherDescriptions = [];
-      day.forEach((time) => {
-        allTemps.push(time.main.temp);
-        allWeatherDescriptions.push(time.weather.main);
-        allIcons.push(time.weather.icon);
-        console.log("allTemps", allTemps);
-        console.log("allIcons", allIcons);
-        console.log("allWeatherDescriptions", allWeatherDescriptions);
-      });
-      // const avgTemp = (day) =>
-      //   day.list.reduce((a, b) => a + b) / day.list.length;
-    };
+    // const daySummary = (dayNum) => {
+    //   const day = processDayData(dayNum);
+    //   console.log(`Day${dayNum} data:`, day);
+    //   const allTemps = [];
+    //   const allIcons = [];
+    //   const allWeatherDescriptions = [];
+    //   day.forEach((time) => {
+    //     allTemps.push(time.main.temp);
+    //     allWeatherDescriptions.push(time.weather.main);
+    //     allIcons.push(time.weather.icon);
+    //     console.log("allTemps", allTemps);
+    //     console.log("allIcons", allIcons);
+    //     console.log("allWeatherDescriptions", allWeatherDescriptions);
+    //   });
+    //   // const avgTemp = (day) =>
+    //   //   day.list.reduce((a, b) => a + b) / day.list.length;
+    // };
 
     // return {
     //   day,
     // };
     // };
 
-    daySummary(1);
+    // daySummary(1);
 
     // const day2 = processDayData(2);
     // const day3 = processDayData(3);
