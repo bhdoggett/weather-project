@@ -78,27 +78,24 @@ async function fetchFiveDay() {
     return fiveDayData;
   }
 
-  async function addFiveDayForecast(data) {
+  async function processFiveDayForecast(data) {
     // create an array for each of the five days
 
-    const dividedDayData = [
-      { avgTemp: 70, mostComonIcon: "10d" },
-      [],
-      [],
-      [],
-      [],
-    ];
+    const dividedDayData = [];
 
     // process information in each array to produce the correct temperature estimate and the most commonly listed icon code. This information could be stored in an object that summarizes the information. this would make it easier to reference in the html tempalate.
 
     // update html template with each day's information
 
     function processDayData(day) {
-      const dayData = {};
-      let indexRange = [];
+      const dayData = { avgTemp: 0, iconSummary: null, weatherSummary: null };
+
       let tempAcc = 0;
-      let iconOccurances = {};
-      let weatherDescriptionOccurances = {};
+      let icons = {};
+      let weatherDescriptions = {};
+
+      // identify the appropriate data range
+      let indexRange = [];
 
       if (day === 1) {
         indexRange = [0, 7];
@@ -116,32 +113,74 @@ async function fetchFiveDay() {
         indexRange = [32, 39];
       }
 
+      // loop through the identified data range to accumulte data
       for (let i = indexRange[0]; i <= indexRange[1]; i++) {
         // console.log(data.list[i]);
         const time = data.list[i];
+
         console.log("Temp:", time.main.temp);
+
+        // accumulate temperature values to calculate average after the fact
         tempAcc += time.main.temp;
 
         console.log(time.weather[0].main);
-        if (iconOccurances.hasOwnProperty(time.weather.main)) {
-          iconOccurances[time.weather[0].main]++;
+
+        // accumulate weather descriptions
+        if (weatherDescriptions.hasOwnProperty(time.weather[0].main)) {
+          weatherDescriptions[time.weather[0].main]++;
         } else {
-          iconOccurances[time.weather[0].main] = 1;
+          weatherDescriptions[time.weather[0].main] = 1;
+        }
+
+        // accumulate weather icons
+        if (icons.hasOwnProperty(time.weather[0].icon)) {
+          icons[time.weather[0].icon]++;
+        } else {
+          icons[time.weather[0].icon] = 1;
+        }
+
+        console.log("Icons:", icons);
+      }
+
+      // calculate temp average
+      dayData.avgTemp = (tempAcc / 8).toFixed(2);
+
+      // find most common weather description. if all weather descriptions are equal, leave the first one.
+      let weatherDescriptionsMaxCount = 0;
+
+      for (let key in weatherDescriptions) {
+        if (weatherDescriptions[key] > weatherDescriptionsMaxCount) {
+          weatherDescriptionsMaxCount = weatherDescriptions[key];
+          dayData.weatherSummary = key;
         }
       }
 
-      const tempAvg = tempAcc / 8;
-      console.log("temp avg:", tempAvg);
+      // find most common icon. if all icons are equal, leave the first icon.
+      let iconMaxCount = 0;
+
+      for (let key in icons) {
+        if (icons[key] > iconMaxCount) {
+          iconMaxCount = icons[key];
+          dayData.iconSummary = key;
+        }
+      }
+
+      console.log("Average Temp:", dayData.avgTemp);
       // dayData.push()
       // console.log(`Day ${day}:`, dayData);
-      console.log("Icon Occurances:", iconOccurances);
+      console.log("Icons:", icons);
+      console.log("Weather Descriptons:", weatherDescriptions);
+      console.log(dayData);
 
       dividedDayData.push(dayData);
     }
 
-    for (let i = 1; i <= 5; i++) {
-      processDayData(i);
-    }
+    // for (let i = 1; i <= 5; i++) {
+    //   processDayData(i);
+    // }
+
+    processDayData(1);
+    console.log(dividedDayData);
 
     // const daySummary = (dayNum) => {
     //   const day = processDayData(dayNum);
@@ -198,7 +237,9 @@ async function fetchFiveDay() {
 
     const fiveDayData = await getFiveDayData(coordinates);
 
-    addFiveDayForecast(fiveDayData);
+    const processedData = await processFiveDayForecast(fiveDayData);
+
+    addFiveDayData(processedData);
 
     // lon = coordinates.lon
     // lat = coordinates.lat
