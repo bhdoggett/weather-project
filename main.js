@@ -175,55 +175,100 @@ async function fetchFiveDay() {
       dividedDayData.push(dayData);
     }
 
-    // for (let i = 1; i <= 5; i++) {
-    //   processDayData(i);
-    // }
+    //loop through all days to return a summary data object or each day
+    for (let i = 1; i <= 5; i++) {
+      processDayData(i);
+    }
 
-    processDayData(1);
-    console.log(dividedDayData);
-
-    // const daySummary = (dayNum) => {
-    //   const day = processDayData(dayNum);
-    //   console.log(`Day${dayNum} data:`, day);
-    //   const allTemps = [];
-    //   const allIcons = [];
-    //   const allWeatherDescriptions = [];
-    //   day.forEach((time) => {
-    //     allTemps.push(time.main.temp);
-    //     allWeatherDescriptions.push(time.weather.main);
-    //     allIcons.push(time.weather.icon);
-    //     console.log("allTemps", allTemps);
-    //     console.log("allIcons", allIcons);
-    //     console.log("allWeatherDescriptions", allWeatherDescriptions);
-    //   });
-    //   // const avgTemp = (day) =>
-    //   //   day.list.reduce((a, b) => a + b) / day.list.length;
-    // };
-
-    // return {
-    //   day,
-    // };
-    // };
-
-    // daySummary(1);
-
-    // const day2 = processDayData(2);
-    // const day3 = processDayData(3);
-    // const day4 = processDayData(4);
-    // const day5 = processDayData(5);
-
-    // console.log(day1, day2, day3, day4, day5);
-    // console.log(processDayData(1));
-
-    // const timestamp = fiveDayExample.list[0].dt; // Unix timestamp in seconds
-    // const date = new Date(timestamp * 1000); // Convert to milliseconds
-    // console.log(date.toUTCString()); // Outputs date in UTC format
-    // console.log(date.toLocaleString()); // Outputs date in local timezone format
+    return dividedDayData;
   }
+
+  async function addFiveDay(summaryData) {
+    const fiveDaySection = document.querySelector(".forecast-5-day");
+    fiveDaySection.replaceChildren();
+
+    console.log("Summary Data:", summaryData);
+    const template = `
+        <div class="col-md-2 container-fluid" id="day-1">
+          <div class="day-container justify-content-center">
+            <p class="text-center">
+              <span class="text-center">${summaryData[0].weatherSummary}</span>
+              <br />
+              <span class="text-center"><strong>${summaryData[0].avgTemp}°</strong></span>
+              <br />
+              <img src="https://openweathermap.org/img/wn/${summaryData[0].iconSummary}@2x.png" alt="" />
+              <br />
+              <span>Day 1</span>
+            </p>
+          </div>
+        </div>
+
+        <div class="col-md-2 container-fluid" id="day-2">
+          <div class="day-container justify-content-center">
+            <p class="text-center">
+              <span class="text-center">${summaryData[1].weatherSummary}</span>
+              <br />
+              <span class="text-center"><strong>${summaryData[1].avgTemp}°</strong></span>
+              <br />
+              <img src="https://openweathermap.org/img/wn/${summaryData[1].iconSummary}@2x.png" alt="" />
+              <br />
+              <span>Day 1</span>
+            </p>
+          </div>
+        </div>
+
+        <div class="col-md-2 container-fluid" id="day-3">
+          <div class="day-container justify-content-center">
+            <p class="text-center">
+              <span class="text-center">${summaryData[2].weatherSummary}</span>
+              <br />
+              <span class="text-center"><strong>${summaryData[2].avgTemp}°</strong></span>
+              <br />
+              <img src="https://openweathermap.org/img/wn/${summaryData[2].iconSummary}@2x.png" alt="" />
+              <br />
+              <span>Day 1</span>
+            </p>
+          </div>
+        </div>
+
+        <div class="col-md-2 container-fluid" id="day-4">
+          <div class="day-container justify-content-center">
+            <p class="text-center">
+              <span class="text-center">${summaryData[3].weatherSummary}</span>
+              <br />
+              <span class="text-center"><strong>${summaryData[3].avgTemp}°</strong></span>
+              <br />
+              <img src="https://openweathermap.org/img/wn/${summaryData[3].iconSummary}@2x.png" alt="" />
+              <br />
+              <span>Day 1</span>
+            </p>
+          </div>
+        </div>
+
+        <div class="col-md-2 container-fluid" id="day-5">
+          <div class="day-container justify-content-center">
+            <p class="text-center">
+              <span class="text-center">${summaryData[4].weatherSummary}</span>
+              <br />
+              <span class="text-center"><strong>${summaryData[4].avgTemp}°</strong></span>
+              <br />
+              <img src="https://openweathermap.org/img/wn/${summaryData[4].iconSummary}@2x.png" alt="" />
+              <br />
+              <span>Day 1</span>
+            </p>
+          </div>
+        </div>
+
+        
+        `;
+
+    fiveDaySection.insertAdjacentHTML("beforeend", template);
+  }
+
   // try {
   //   const data = await fetchData(); // fetch coordinates funciton called
 
-  //   const step1Result = await processStep1(data); // fetch five day data funciton falled
+  //   const step1Result = await processStep1(data); // fetch five day data funciton called
 
   //   const step2Result = await processStep2(step1Result); // update templates function called
 
@@ -239,32 +284,7 @@ async function fetchFiveDay() {
 
     const processedData = await processFiveDayForecast(fiveDayData);
 
-    addFiveDayData(processedData);
-
-    // lon = coordinates.lon
-    // lat = coordinates.lat
-
-    // const fetchLongAndLat = await (query) => {
-    //   const geoLocationURL = `http://api.openweathermap.org/geo/1.0/direct?q=${query}${limit}&appid=${apiKey}`;
-
-    //   console.log(geoLocationURL);
-
-    //   // need to fetch the longituted and latitude from the query
-
-    //   fetch(geoLocationURL, {
-    //     method: "Get",
-    //     dataType: "json",
-    //   })
-    //     .then((data) => data.json())
-    //     .then(() => {
-    //       lon = data.lon;
-    //       lat = data.lat;
-    //     });
-    // };
-
-    // with that info ineed to construc the fiveDay fetch URL
-
-    // const fiveDayData = await fiveDayCall.json();
+    addFiveDay(processedData);
   } catch (error) {
     console.error("Error processing data:", error);
   }
