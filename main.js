@@ -1,43 +1,57 @@
 const apiKey = "6427275c4ee8b157888fdf144b2fc5ca";
 const units = "imperial";
 
-const fetchNow = () => {
-  const query = document.querySelector("#query").value.replace(/\s+/g, "%20");
+// const fetchCountries = () => {
+//   const
+// }
 
-  console.log(query);
-  const url = `https://api.openweathermap.org/data/2.5/weather?q=${query}$&limit=1&appid=${apiKey}&units=${units}`;
-  console.log(url);
+async function getNow() {
+  async function fetchNow() {
+    const query = document.querySelector("#query").value.replace(/\s+/g, "%20");
 
-  fetch(url, {
-    method: "Get",
-    dataType: "json",
-  })
-    .then((data) => data.json())
-    .then((data) => addNow(data));
-};
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${query}$&limit=1&appid=${apiKey}&units=${units}`;
+    console.log(url);
 
-const addNow = (data) => {
-  const nowSection = document.querySelector("#now");
-  nowSection.replaceChildren();
+    const fetchedData = await fetch(url, {
+      method: "Get",
+      dataType: "json",
+    });
 
-  const template = `
-  <div class="col-md-2">
-    <h3 class="text-center">${data.main.temp.toFixed(1)}</h3>
-    <h4 class="text-center">${data.name}</h4>
-    <h5 class="text-center">${data.weather[0].main}</h5>
-  </div>
-  <div class="col-md-2">
-    <img
-      src="https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png"
-      alt="unable to load image"
-    />
-  </div>
-  `;
+    const nowData = await fetchedData.json();
 
-  nowSection.insertAdjacentHTML("beforeend", template);
-};
+    return nowData;
+  }
 
-async function fetchFiveDay() {
+  async function addNow(data) {
+    const nowSection = document.querySelector("#now");
+    nowSection.replaceChildren();
+
+    const template = `
+    <div class="col-md-2">
+      <h3 class="text-center">${data.main.temp.toFixed(1)}</h3>
+      <h4 class="text-center">${data.name}</h4>
+      <h5 class="text-center">${data.weather[0].main}</h5>
+    </div>
+    <div class="col-md-2">
+      <img
+        src="https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png"
+        alt="unable to load image"
+      />
+    </div>
+    `;
+
+    nowSection.insertAdjacentHTML("beforeend", template);
+  }
+
+  try {
+    const nowData = await fetchNow();
+    addNow(nowData);
+  } catch (error) {
+    console.error("Error processing data:", error);
+  }
+}
+
+async function getFiveDay() {
   async function fetchCoordinates() {
     const query = document.querySelector("#query").value.replace(/\s+/g, "%20");
 
@@ -154,10 +168,7 @@ async function fetchFiveDay() {
       });
 
       dayData.dayName = dateFormatter.format(dt_txt);
-      // console.log(dayName);
 
-      // console.log("Day 1:", dayName);
-      // calculate temp average
       dayData.avgTemp = (tempAcc / 8).toFixed(1);
 
       // find most common weather description. if all weather descriptions are equal, leave the first one.
@@ -179,15 +190,6 @@ async function fetchFiveDay() {
           dayData.iconSummary = key;
         }
       }
-
-      // use date-fns to convert date information into datys of the week. Find most common day
-
-      // console.log("Average Temp:", dayData.avgTemp);
-      // dayData.push()
-      // console.log(`Day ${day}:`, dayData);
-      // console.log("Icons:", icons);
-      // console.log("Weather Descriptons:", weatherDescriptions);
-      // console.log(dayData);
 
       dividedDayData.push(dayData);
     }
@@ -275,32 +277,15 @@ async function fetchFiveDay() {
             </p>
           </div>
         </div>
-
-        
         `;
 
     fiveDaySection.insertAdjacentHTML("beforeend", template);
   }
 
-  // try {
-  //   const data = await fetchData(); // fetch coordinates funciton called
-
-  //   const step1Result = await processStep1(data); // fetch five day data funciton called
-
-  //   const step2Result = await processStep2(step1Result); // update templates function called
-
-  //   console.log(step2Result);
-  // } catch (error) {
-  //   console.error("Error processing data:", error);
-  // }
-
   try {
     const coordinates = await fetchCoordinates();
-
     const fiveDayData = await getFiveDayData(coordinates);
-
     const processedData = await processFiveDayForecast(fiveDayData);
-
     addFiveDay(processedData);
   } catch (error) {
     console.error("Error processing data:", error);
@@ -309,6 +294,6 @@ async function fetchFiveDay() {
 
 const searchButton = document.querySelector(".search");
 searchButton.addEventListener("click", () => {
-  fetchNow();
-  fetchFiveDay();
+  getNow();
+  getFiveDay();
 });
