@@ -1,5 +1,3 @@
-// import { WEATHER_API_KEY } from "./key.js";
-
 const apiKey = "6427275c4ee8b157888fdf144b2fc5ca";
 const units = "imperial";
 
@@ -24,7 +22,7 @@ const addNow = (data) => {
 
   const template = `
   <div class="col-md-2">
-    <h3 class="text-center">${data.main.temp}</h3>
+    <h3 class="text-center">${data.main.temp.toFixed(1)}</h3>
     <h4 class="text-center">${data.name}</h4>
     <h5 class="text-center">${data.weather[0].main}</h5>
   </div>
@@ -88,7 +86,12 @@ async function fetchFiveDay() {
     // update html template with each day's information
 
     function processDayData(day) {
-      const dayData = { avgTemp: 0, iconSummary: null, weatherSummary: null };
+      const dayData = {
+        avgTemp: 0,
+        iconSummary: null,
+        weatherSummary: null,
+        dayName: "",
+      };
 
       let tempAcc = 0;
       let icons = {};
@@ -117,6 +120,7 @@ async function fetchFiveDay() {
       for (let i = indexRange[0]; i <= indexRange[1]; i++) {
         // console.log(data.list[i]);
         const time = data.list[i];
+        const dt_text = data.list[indexRange[0]];
 
         console.log("Temp:", time.main.temp);
 
@@ -139,11 +143,22 @@ async function fetchFiveDay() {
           icons[time.weather[0].icon] = 1;
         }
 
-        console.log("Icons:", icons);
+        // console.log("Icons:", icons);
       }
 
+      const dt_txt = new Date(data.list[indexRange[0]].dt_txt);
+      console.log("dt_txt:", dt_txt);
+
+      const dateFormatter = new Intl.DateTimeFormat("en-US", {
+        weekday: "long",
+      });
+
+      dayData.dayName = dateFormatter.format(dt_txt);
+      // console.log(dayName);
+
+      // console.log("Day 1:", dayName);
       // calculate temp average
-      dayData.avgTemp = (tempAcc / 8).toFixed(2);
+      dayData.avgTemp = (tempAcc / 8).toFixed(1);
 
       // find most common weather description. if all weather descriptions are equal, leave the first one.
       let weatherDescriptionsMaxCount = 0;
@@ -165,12 +180,14 @@ async function fetchFiveDay() {
         }
       }
 
-      console.log("Average Temp:", dayData.avgTemp);
+      // use date-fns to convert date information into datys of the week. Find most common day
+
+      // console.log("Average Temp:", dayData.avgTemp);
       // dayData.push()
       // console.log(`Day ${day}:`, dayData);
-      console.log("Icons:", icons);
-      console.log("Weather Descriptons:", weatherDescriptions);
-      console.log(dayData);
+      // console.log("Icons:", icons);
+      // console.log("Weather Descriptons:", weatherDescriptions);
+      // console.log(dayData);
 
       dividedDayData.push(dayData);
     }
@@ -179,7 +196,7 @@ async function fetchFiveDay() {
     for (let i = 1; i <= 5; i++) {
       processDayData(i);
     }
-
+    console.log(dividedDayData);
     return dividedDayData;
   }
 
@@ -198,7 +215,7 @@ async function fetchFiveDay() {
               <br />
               <img src="https://openweathermap.org/img/wn/${summaryData[0].iconSummary}@2x.png" alt="" />
               <br />
-              <span>Day 1</span>
+              <span>${summaryData[0].dayName}</span>
             </p>
           </div>
         </div>
@@ -212,7 +229,7 @@ async function fetchFiveDay() {
               <br />
               <img src="https://openweathermap.org/img/wn/${summaryData[1].iconSummary}@2x.png" alt="" />
               <br />
-              <span>Day 1</span>
+              <span>${summaryData[1].dayName}</span>
             </p>
           </div>
         </div>
@@ -226,7 +243,7 @@ async function fetchFiveDay() {
               <br />
               <img src="https://openweathermap.org/img/wn/${summaryData[2].iconSummary}@2x.png" alt="" />
               <br />
-              <span>Day 1</span>
+              <span>${summaryData[2].dayName}</span>
             </p>
           </div>
         </div>
@@ -240,7 +257,7 @@ async function fetchFiveDay() {
               <br />
               <img src="https://openweathermap.org/img/wn/${summaryData[3].iconSummary}@2x.png" alt="" />
               <br />
-              <span>Day 1</span>
+              <span>${summaryData[3].dayName}</span>
             </p>
           </div>
         </div>
@@ -254,7 +271,7 @@ async function fetchFiveDay() {
               <br />
               <img src="https://openweathermap.org/img/wn/${summaryData[4].iconSummary}@2x.png" alt="" />
               <br />
-              <span>Day 1</span>
+              <span>${summaryData[4].dayName}</span>
             </p>
           </div>
         </div>
