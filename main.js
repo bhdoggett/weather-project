@@ -42,8 +42,6 @@ async function addCurrentLocation() {
     const fiveDayData = await fetchFiveDayData(location);
     const processedData = await processFiveDayData(fiveDayData);
     addFiveDay(processedData);
-
-    addFiveDay;
   } catch (error) {
     console.error("Error processing data:", error);
   }
