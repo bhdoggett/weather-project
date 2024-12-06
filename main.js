@@ -239,76 +239,30 @@ async function addFiveDay(summaryData) {
   const fiveDaySection = document.querySelector(".forecast-5-day");
   fiveDaySection.replaceChildren();
 
-  const template = `
+  const dayTemplate = (summaryItem) => `
+    <div class="col-md-2 container-fluid border justify-content-center" id="day-1">
+      <p class="text-center mt-2">
+        <p class="text-center m-0">${summaryItem.weatherSummary}
+        </p>
+        <p class="text-center m-0"><strong>${summaryItem.avgTemp}°</strong>
+        </p>
+        <img src="https://openweathermap.org/img/wn/${summaryItem.iconSummary}@2x.png" alt="" />
+        <p class="text-center m-0">${summaryItem.dayName}</p>
+      </p>
+    </div>
+    `;
+
+  const allDaysTemplate = `
     <div class="row justify-content-center">
       <h2>Five Day Forecast</h2>
     </div>
 
-
     <div class="row justify-content-center my-2">
-      <div class="col-md-2 container-fluid border justify-content-center" id="day-1">
-        <p class="text-center mt-2">
-          <span class="text-center">${summaryData[0].weatherSummary}</span>
-          <br />
-          <span class="text-center"><strong>${summaryData[0].avgTemp}°</strong></span>
-          <br />
-          <img src="https://openweathermap.org/img/wn/${summaryData[0].iconSummary}@2x.png" alt="" />
-          <br />
-          <span>${summaryData[0].dayName}</span>
-        </p>
-      </div>
-
-      <div class="col-md-2 container-fluid border justify-content-center" id="day-2">
-        <p class="text-center mt-2">
-          <span class="text-center">${summaryData[1].weatherSummary}</span>
-          <br />
-          <span class="text-center"><strong>${summaryData[1].avgTemp}°</strong></span>
-          <br />
-          <img src="https://openweathermap.org/img/wn/${summaryData[1].iconSummary}@2x.png" alt="" />
-          <br />
-          <span>${summaryData[1].dayName}</span>
-        </p>
-      </div>
-
-      <div class="col-md-2 container-fluid border justify-content-center" id="day-3">
-        <p class="text-center mt-2">
-          <span class="text-center">${summaryData[2].weatherSummary}</span>
-          <br />
-          <span class="text-center"><strong>${summaryData[2].avgTemp}°</strong></span>
-          <br />
-          <img src="https://openweathermap.org/img/wn/${summaryData[2].iconSummary}@2x.png" alt="" />
-          <br />
-          <span>${summaryData[2].dayName}</span>
-        </p>
-      </div>
-
-      <div class="col-md-2 container-fluid border justify-content-center" id="day-4">
-        <p class="text-center mt-2">
-          <span class="text-center">${summaryData[3].weatherSummary}</span>
-          <br />
-          <span class="text-center"><strong>${summaryData[3].avgTemp}°</strong></span>
-          <br />
-          <img src="https://openweathermap.org/img/wn/${summaryData[3].iconSummary}@2x.png" alt="" />
-          <br />
-          <span>${summaryData[3].dayName}</span>
-        </p>
-      </div>
-
-      <div class="col-md-2 container-fluid border justify-content-center" id="day-5">
-        <p class="text-center mt-2">
-          <span class="text-center">${summaryData[4].weatherSummary}</span>
-          <br />
-          <span class="text-center"><strong>${summaryData[4].avgTemp}°</strong></span>
-          <br />
-          <img src="https://openweathermap.org/img/wn/${summaryData[4].iconSummary}@2x.png" alt="" />
-          <br />
-          <span>${summaryData[4].dayName}</span>
-        </p>
-      </div>    
+    ${summaryData.map((summaryItem) => dayTemplate(summaryItem)).join("")}
     </div>
       `;
 
-  fiveDaySection.insertAdjacentHTML("beforeend", template);
+  fiveDaySection.insertAdjacentHTML("beforeend", allDaysTemplate);
 }
 
 const searchButton = document.querySelector(".search");
