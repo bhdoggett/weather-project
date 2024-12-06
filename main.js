@@ -4,7 +4,6 @@ const units = "imperial";
 const getCurrentLocation = () => {
   const options = {
     enableHighAccuracy: true,
-    timeout: 5000,
     maximumAge: 0,
   };
 
@@ -16,8 +15,7 @@ const getCurrentLocation = () => {
           lat: pos.coords.latitude,
         });
       },
-      (error) => reject(console.warn(`ERROR(${error.code}): ${error.message}`)),
-      options
+      (error) => reject(console.warn(`ERROR(${error.code}): ${error.message}`))
     );
   });
 };
@@ -165,29 +163,14 @@ async function processFiveDayData(data) {
     let weatherDescriptions = {};
 
     // identify the appropriate data range
-    let indexRange = [];
-
-    if (day === 1) {
-      indexRange = [0, 7];
-    }
-    if (day === 2) {
-      indexRange = [8, 15];
-    }
-    if (day === 3) {
-      indexRange = [16, 23];
-    }
-    if (day === 4) {
-      indexRange = [24, 31];
-    }
-    if (day === 5) {
-      indexRange = [32, 39];
-    }
+    const indexRange = [(day - 1) * 8, day * 8 - 1];
 
     // loop through the identified data range to accumulte data
     for (let i = indexRange[0]; i <= indexRange[1]; i++) {
       const time = data.list[i];
 
       // accumulate temperature values to calculate average after the fact
+      console.log(time);
       tempAcc += time.main.temp;
 
       // accumulate weather descriptions
@@ -217,6 +200,8 @@ async function processFiveDayData(data) {
     });
 
     dayData.dayName = dateFormatter.format(dt_txt);
+    console.log(`list index ${indexRange[0]}:`, data.list[indexRange[0]]);
+    console.log("Day Name", dayData.dayName);
 
     // find most common weather description. if all weather descriptions are equal, leave the first one.
     let weatherDescriptionsMaxCount = 0;
@@ -281,7 +266,7 @@ async function addFiveDay(summaryData) {
           <br />
           <img src="https://openweathermap.org/img/wn/${summaryData[1].iconSummary}@2x.png" alt="" />
           <br />
-          <span>${summaryData[0].dayName}</span>
+          <span>${summaryData[1].dayName}</span>
         </p>
       </div>
 
