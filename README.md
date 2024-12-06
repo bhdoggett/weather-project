@@ -6,4 +6,4 @@ If you have any questions about this project or the program in general, visit [p
 
 --
 
-To convert time/date information to
+Use countries+cities.json from https://github.com/dr5hn/countries-states-cities-database/tree/master/json to populate autocomplete of the inptu field?
