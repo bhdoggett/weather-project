@@ -142,13 +142,7 @@ async function fetchFiveDayData(coordinates) {
 }
 
 async function processFiveDayData(data) {
-  // create an array for each of the five days
-
   const dividedDayData = [];
-
-  // process information in each array to produce the correct temperature estimate and the most commonly listed icon code and the name of the day. This information could be stored in an object that summarizes the information. This would make it easier to reference in the html tempalate.
-
-  // update html template with each day's information
 
   function processDayData(day) {
     const dayData = {
@@ -162,25 +156,19 @@ async function processFiveDayData(data) {
     let icons = {};
     let weatherDescriptions = {};
 
-    // identify the appropriate data range
     const indexRange = [(day - 1) * 8, day * 8 - 1];
 
-    // loop through the identified data range to accumulte data
     for (let i = indexRange[0]; i <= indexRange[1]; i++) {
       const time = data.list[i];
 
-      // accumulate temperature values to calculate average after the fact
-      console.log(time);
       tempAcc += time.main.temp;
 
-      // accumulate weather descriptions
       if (weatherDescriptions.hasOwnProperty(time.weather[0].main)) {
         weatherDescriptions[time.weather[0].main]++;
       } else {
         weatherDescriptions[time.weather[0].main] = 1;
       }
 
-      // accumulate weather icons
       if (icons.hasOwnProperty(time.weather[0].icon)) {
         icons[time.weather[0].icon]++;
       } else {
@@ -188,10 +176,7 @@ async function processFiveDayData(data) {
       }
     }
 
-    // calculate average by dividing accumulated temperatures by 8
     dayData.avgTemp = (tempAcc / 8).toFixed(1);
-
-    // find the day of the week by creating a new Date, and the processessing that with Intl.DateTimeFormat.
 
     const dt_txt = new Date(data.list[indexRange[0]].dt_txt);
 
@@ -200,10 +185,7 @@ async function processFiveDayData(data) {
     });
 
     dayData.dayName = dateFormatter.format(dt_txt);
-    console.log(`list index ${indexRange[0]}:`, data.list[indexRange[0]]);
-    console.log("Day Name", dayData.dayName);
 
-    // find most common weather description. if all weather descriptions are equal, leave the first one.
     let weatherDescriptionsMaxCount = 0;
 
     for (let key in weatherDescriptions) {
@@ -213,7 +195,6 @@ async function processFiveDayData(data) {
       }
     }
 
-    // find most common icon. if all icons are equal, leave the first icon.
     let iconMaxCount = 0;
 
     for (let key in icons) {
@@ -226,7 +207,6 @@ async function processFiveDayData(data) {
     return dayData;
   }
 
-  //loop through all days to return a summary data object or each day
   for (let i = 1; i <= 5; i++) {
     const processedDayData = processDayData(i);
     dividedDayData.push(processedDayData);
