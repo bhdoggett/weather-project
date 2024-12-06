@@ -140,8 +140,6 @@ async function fetchFiveDayData(coordinates) {
 
   const fiveDayData = await fetchFiveDay.json();
 
-  console.log("Five Day Data:", fiveDayData);
-
   return fiveDayData;
 }
 
@@ -256,7 +254,6 @@ async function addFiveDay(summaryData) {
   const fiveDaySection = document.querySelector(".forecast-5-day");
   fiveDaySection.replaceChildren();
 
-  console.log("Summary Data:", summaryData);
   const template = `
     <div class="row justify-content-center">
       <h2>Five Day Forecast</h2>
