@@ -1,6 +1,58 @@
 const apiKey = "6427275c4ee8b157888fdf144b2fc5ca";
 const units = "imperial";
 
+const getCurrentLocation = () => {
+  const options = {
+    enableHighAccuracy: true,
+    timeout: 5000,
+    maximumAge: 0,
+  };
+
+  return new Promise((resolve, reject) => {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        resolve({
+          lon: pos.coords.longitude,
+          lat: pos.coords.latitude,
+        });
+      },
+      (error) => reject(console.warn(`ERROR(${error.code}): ${error.message}`)),
+      options
+    );
+  });
+};
+
+async function fetchCurrentLocationData(location) {
+  const url = `https://api.openweathermap.org/data/2.5/weather?lat=${location.lat}&lon=${location.lon}&appid=${apiKey}&units=${units}`;
+
+  const fetchedData = await fetch(url, {
+    method: "GET",
+    data: "json",
+  });
+
+  const currentLocationData = await fetchedData.json();
+
+  return currentLocationData;
+}
+
+async function addCurrentLocation() {
+  try {
+    const location = await getCurrentLocation();
+    const locationData = await fetchCurrentLocationData(location);
+    addNow(locationData);
+
+    const fiveDayData = await fetchFiveDayData(location);
+    const processedData = await processFiveDayData(fiveDayData);
+    addFiveDay(processedData);
+
+    addFiveDay;
+  } catch (error) {
+    console.error("Error processing data:", error);
+  }
+}
+
+addCurrentLocation();
+
 async function getNow() {
   try {
     const nowData = await fetchNow();
