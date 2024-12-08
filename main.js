@@ -219,14 +219,14 @@ async function addFiveDay(summaryData) {
 
   const dayTemplate = (summaryItem) => `
     <div class="col-md-2 container-fluid border justify-content-center" id="day-1">
-      <p class="text-center mt-2">
+      <div class="text-center mt-2">
         <p class="text-center m-0">${summaryItem.weatherSummary}
         </p>
         <p class="text-center m-0"><strong>${summaryItem.avgTemp}°</strong>
         </p>
-        <img src="https://openweathermap.org/img/wn/${summaryItem.iconSummary}@2x.png" alt="" />
-        <p class="text-center m-0">${summaryItem.dayName}</p>
-      </p>
+        <img src="https://openweathermap.org/img/wn/${summaryItem.iconSummary}@2x.png" alt="" class="mx-auto">
+        <h5 class="text-center m-2">${summaryItem.dayName}</h5>
+      </div>
     </div>
     `;
 
