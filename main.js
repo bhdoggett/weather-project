@@ -20,7 +20,7 @@ const getCurrentLocation = () => {
   });
 };
 
-async function fetchCurrentLocationData(location) {
+const fetchCurrentLocationData = async (location) => {
   const url = `https://api.openweathermap.org/data/2.5/weather?lat=${location.lat}&lon=${location.lon}&appid=${apiKey}&units=${units}`;
 
   const fetchedData = await fetch(url, {
@@ -31,9 +31,9 @@ async function fetchCurrentLocationData(location) {
   const currentLocationData = await fetchedData.json();
 
   return currentLocationData;
-}
+};
 
-async function addCurrentLocation() {
+const addCurrentLocation = async () => {
   try {
     const location = await getCurrentLocation();
     const locationData = await fetchCurrentLocationData(location);
@@ -45,20 +45,20 @@ async function addCurrentLocation() {
   } catch (error) {
     console.error("Error processing data:", error);
   }
-}
+};
 
 addCurrentLocation();
 
-async function getNow() {
+const getNow = async () => {
   try {
     const nowData = await fetchNow();
     addNow(nowData);
   } catch (error) {
     console.error("Error processing data:", error);
   }
-}
+};
 
-async function fetchNow() {
+const fetchNow = async () => {
   const query = document.querySelector("#query").value.replace(/\s+/g, "%20");
 
   const url = `https://api.openweathermap.org/data/2.5/weather?q=${query}$&limit=1&appid=${apiKey}&units=${units}`;
@@ -71,9 +71,9 @@ async function fetchNow() {
   const nowData = await fetchedData.json();
 
   return nowData;
-}
+};
 
-async function addNow(data) {
+const addNow = async (data) => {
   const nowSection = document.querySelector("#now");
   nowSection.replaceChildren();
 
@@ -95,9 +95,9 @@ async function addNow(data) {
   `;
 
   nowSection.insertAdjacentHTML("beforeend", template);
-}
+};
 
-async function getFiveDay() {
+const getFiveDay = async () => {
   try {
     const coordinates = await fetchCoordinates();
     const fiveDayData = await fetchFiveDayData(coordinates);
@@ -106,9 +106,9 @@ async function getFiveDay() {
   } catch (error) {
     console.error("Error processing data:", error);
   }
-}
+};
 
-async function fetchCoordinates() {
+const fetchCoordinates = async () => {
   const query = document.querySelector("#query").value.replace(/\s+/g, "%20");
 
   const coordinatesCall = await fetch(
@@ -124,9 +124,9 @@ async function fetchCoordinates() {
   const coordinates = coordinatesArray[0];
 
   return coordinates;
-}
+};
 
-async function fetchFiveDayData(coordinates) {
+const fetchFiveDayData = async (coordinates) => {
   const fiveDayURL = `https://api.openweathermap.org/data/2.5/forecast?lat=${coordinates.lat}&lon=${coordinates.lon}&appid=${apiKey}&units=${units}`;
 
   const fetchFiveDay = await fetch(fiveDayURL, {
@@ -137,15 +137,15 @@ async function fetchFiveDayData(coordinates) {
   const fiveDayData = await fetchFiveDay.json();
 
   return fiveDayData;
-}
+};
 
-async function processFiveDayData(data) {
+const processFiveDayData = async (data) => {
   const dividedDayData = [];
 
-  function processDayData(day) {
+  const processDayData = (day) => {
     const indexRange = [(day - 1) * 8, day * 8 - 1];
 
-    function getAvgTemp() {
+    const getAvgTemp = () => {
       let acc = 0;
       let timeIndex = 0;
 
@@ -157,9 +157,9 @@ async function processFiveDayData(data) {
       }
 
       return acc;
-    }
+    };
 
-    function getSummaryIcon() {
+    const getSummaryIcon = () => {
       let icons = {};
 
       for (let i = indexRange[0]; i <= indexRange[1]; i++) {
@@ -182,9 +182,9 @@ async function processFiveDayData(data) {
         }
       }
       return iconSummary;
-    }
+    };
 
-    function getDayName() {
+    const getDayName = () => {
       const dt_txt = new Date(data.list[indexRange[0]].dt_txt);
 
       const dateFormatter = new Intl.DateTimeFormat("en-US", {
@@ -192,9 +192,9 @@ async function processFiveDayData(data) {
       });
 
       return dateFormatter.format(dt_txt);
-    }
+    };
 
-    function getSummaryWeatherDescription() {
+    const getSummaryWeatherDescription = () => {
       let weatherDescriptions = {};
 
       for (let i = indexRange[0]; i <= indexRange[1]; i++) {
@@ -217,7 +217,7 @@ async function processFiveDayData(data) {
         }
       }
       return summaryDescription;
-    }
+    };
 
     return {
       avgTemp: getAvgTemp(),
@@ -225,7 +225,7 @@ async function processFiveDayData(data) {
       weatherSummary: getSummaryWeatherDescription(),
       dayName: getDayName(),
     };
-  }
+  };
 
   for (let i = 1; i <= 5; i++) {
     const processedDayData = processDayData(i);
@@ -233,9 +233,9 @@ async function processFiveDayData(data) {
   }
 
   return dividedDayData;
-}
+};
 
-async function addFiveDay(summaryData) {
+const addFiveDay = (summaryData) => {
   const fiveDaySection = document.querySelector(".forecast-5-day");
   fiveDaySection.replaceChildren();
 
@@ -263,7 +263,7 @@ async function addFiveDay(summaryData) {
       `;
 
   fiveDaySection.insertAdjacentHTML("beforeend", allDaysTemplate);
-}
+};
 
 const searchButton = document.querySelector(".search");
 searchButton.addEventListener("click", () => {
