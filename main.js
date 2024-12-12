@@ -143,66 +143,88 @@ async function processFiveDayData(data) {
   const dividedDayData = [];
 
   function processDayData(day) {
-    const dayData = {
-      avgTemp: 0,
-      iconSummary: null,
-      weatherSummary: null,
-      dayName: "",
-    };
-
-    let tempAcc = 0;
-    let icons = {};
-    let weatherDescriptions = {};
-
     const indexRange = [(day - 1) * 8, day * 8 - 1];
 
-    for (let i = indexRange[0]; i <= indexRange[1]; i++) {
-      const time = data.list[i];
+    function getAvgTemp() {
+      let acc = 0;
+      let timeIndex = 0;
 
-      tempAcc += time.main.temp;
-
-      if (weatherDescriptions.hasOwnProperty(time.weather[0].main)) {
-        weatherDescriptions[time.weather[0].main]++;
-      } else {
-        weatherDescriptions[time.weather[0].main] = 1;
+      for (let i = indexRange[0]; i <= indexRange[1]; i++) {
+        const currentTemp = data.list[i].main.temp;
+        acc += (currentTemp - acc) / (timeIndex + 1);
+        timeIndex++;
+        return acc;
       }
 
-      if (icons.hasOwnProperty(time.weather[0].icon)) {
-        icons[time.weather[0].icon]++;
-      } else {
-        icons[time.weather[0].icon] = 1;
-      }
+      return acc;
     }
 
-    dayData.avgTemp = (tempAcc / 8).toFixed(1);
+    function getSummaryIcon() {
+      let icons = {};
 
-    const dt_txt = new Date(data.list[indexRange[0]].dt_txt);
+      for (let i = indexRange[0]; i <= indexRange[1]; i++) {
+        const icon = data.list[i].weather[0].icon;
 
-    const dateFormatter = new Intl.DateTimeFormat("en-US", {
-      weekday: "long",
-    });
-
-    dayData.dayName = dateFormatter.format(dt_txt);
-
-    let weatherDescriptionsMaxCount = 0;
-
-    for (let key in weatherDescriptions) {
-      if (weatherDescriptions[key] > weatherDescriptionsMaxCount) {
-        weatherDescriptionsMaxCount = weatherDescriptions[key];
-        dayData.weatherSummary = key;
+        if (icons.hasOwnProperty(icon)) {
+          icons[icon]++;
+        } else {
+          icons[icon] = 1;
+        }
       }
+
+      let iconMaxCount = 0;
+      let iconSummary = "";
+
+      for (let key in icons) {
+        if (icons[key] > iconMaxCount) {
+          iconMaxCount = icons[key];
+          iconSummary = key;
+        }
+      }
+      return iconSummary;
     }
 
-    let iconMaxCount = 0;
+    function getDayName() {
+      const dt_txt = new Date(data.list[indexRange[0]].dt_txt);
 
-    for (let key in icons) {
-      if (icons[key] > iconMaxCount) {
-        iconMaxCount = icons[key];
-        dayData.iconSummary = key;
-      }
+      const dateFormatter = new Intl.DateTimeFormat("en-US", {
+        weekday: "long",
+      });
+
+      return dateFormatter.format(dt_txt);
     }
 
-    return dayData;
+    function getSummaryWeatherDescription() {
+      let weatherDescriptions = {};
+
+      for (let i = indexRange[0]; i <= indexRange[1]; i++) {
+        const weatherDescription = data.list[i].weather[0].main;
+
+        if (weatherDescriptions.hasOwnProperty(weatherDescription)) {
+          weatherDescriptions[weatherDescription]++;
+        } else {
+          weatherDescriptions[weatherDescription] = 1;
+        }
+      }
+
+      let weatherDescriptionsMaxCount = 0;
+      let summaryDescription = "";
+
+      for (let key in weatherDescriptions) {
+        if (weatherDescriptions[key] > weatherDescriptionsMaxCount) {
+          weatherDescriptionsMaxCount = weatherDescriptions[key];
+          summaryDescription = key;
+        }
+      }
+      return summaryDescription;
+    }
+
+    return {
+      avgTemp: getAvgTemp(),
+      iconSummary: getSummaryIcon(),
+      weatherSummary: getSummaryWeatherDescription(),
+      dayName: getDayName(),
+    };
   }
 
   for (let i = 1; i <= 5; i++) {
