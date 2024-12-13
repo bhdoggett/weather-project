@@ -218,17 +218,17 @@ const processFiveDayData = async (data) => {
       return summaryDescription;
     };
 
-    return {
+    dividedDayData.push({
       avgTemp: getAvgTemp(),
       iconSummary: getSummaryIcon(),
       weatherSummary: getSummaryWeatherDescription(),
       dayName: getDayName(),
-    };
+    });
   };
 
   for (let i = 1; i <= 5; i++) {
-    const processedDayData = processDayData(i);
-    dividedDayData.push(processedDayData);
+    processDayData(i);
+    // dividedDayData.push(processedDayData);
   }
 
   return dividedDayData;
