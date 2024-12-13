@@ -153,10 +153,9 @@ const processFiveDayData = async (data) => {
         const currentTemp = data.list[i].main.temp;
         acc += (currentTemp - acc) / (timeIndex + 1);
         timeIndex++;
-        return acc;
       }
 
-      return acc;
+      return acc.toFixed(1);
     };
 
     const getSummaryIcon = () => {
