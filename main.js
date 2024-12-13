@@ -1,6 +1,7 @@
 const apiKey = "6427275c4ee8b157888fdf144b2fc5ca";
 const units = "imperial";
 
+// Fetch current cocation to display default weather forecast.This returns an object in the form of {lat:____, lon:____}
 const getCurrentLocation = () => {
   const options = {
     enableHighAccuracy: true,
@@ -9,17 +10,19 @@ const getCurrentLocation = () => {
 
   return new Promise((resolve, reject) => {
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
+      (position) => {
         resolve({
-          lon: pos.coords.longitude,
-          lat: pos.coords.latitude,
+          lon: position.coords.longitude,
+          lat: position.coords.latitude,
         });
       },
-      (error) => reject(console.warn(`ERROR(${error.code}): ${error.message}`))
+      (error) => reject(console.warn(`ERROR(${error.code}): ${error.message}`)),
+      options
     );
   });
 };
 
+// Using the current location, fetch the appropriate weather data from OpenWeather API
 const fetchCurrentLocationData = async (location) => {
   const url = `https://api.openweathermap.org/data/2.5/weather?lat=${location.lat}&lon=${location.lon}&appid=${apiKey}&units=${units}`;
 
@@ -33,6 +36,7 @@ const fetchCurrentLocationData = async (location) => {
   return currentLocationData;
 };
 
+// Update HTML with current/default location weather data
 const addCurrentLocation = async () => {
   try {
     const location = await getCurrentLocation();
@@ -49,6 +53,7 @@ const addCurrentLocation = async () => {
 
 addCurrentLocation();
 
+// Use fetchNow() and addNow() functions to update the current weather forecast section of the HTML from a given locaiton query
 const getNow = async () => {
   try {
     const nowData = await fetchNow();
@@ -58,6 +63,7 @@ const getNow = async () => {
   }
 };
 
+// Fetch current weatehr data for the location queried
 const fetchNow = async () => {
   const query = document.querySelector("#query").value.replace(/\s+/g, "%20");
 
@@ -73,6 +79,7 @@ const fetchNow = async () => {
   return nowData;
 };
 
+// Use template to update HTML for the current weather forecast based on data from the queried location
 const addNow = async (data) => {
   const nowSection = document.querySelector("#now");
   nowSection.replaceChildren();
@@ -97,6 +104,7 @@ const addNow = async (data) => {
   nowSection.insertAdjacentHTML("beforeend", template);
 };
 
+// Use a series of functions to populate the 5-day forecast section of the HTML
 const getFiveDay = async () => {
   try {
     const coordinates = await fetchCoordinates();
@@ -108,6 +116,7 @@ const getFiveDay = async () => {
   }
 };
 
+// Use Open Weather Geolocation API to return data, {lat:____, lon:___}, for the queried location
 const fetchCoordinates = async () => {
   const query = document.querySelector("#query").value.replace(/\s+/g, "%20");
 
@@ -126,6 +135,7 @@ const fetchCoordinates = async () => {
   return coordinates;
 };
 
+// Given an object with {lat:___, lon:___} syntax, fetch five-day weather information. This returns 40 instances of data which must be divided into 5 sets of 8.
 const fetchFiveDayData = async (coordinates) => {
   const fiveDayURL = `https://api.openweathermap.org/data/2.5/forecast?lat=${coordinates.lat}&lon=${coordinates.lon}&appid=${apiKey}&units=${units}`;
 
@@ -139,6 +149,7 @@ const fetchFiveDayData = async (coordinates) => {
   return fiveDayData;
 };
 
+// Colate data from each day in the five-day forecast.
 const processFiveDayData = async (data) => {
   const dividedDayData = [];
 
@@ -194,6 +205,7 @@ const processFiveDayData = async (data) => {
     };
 
     const getSummaryWeatherDescription = () => {
+      let dayData = {};
       let weatherDescriptions = {};
 
       for (let i = indexRange[0]; i <= indexRange[1]; i++) {
@@ -218,22 +230,23 @@ const processFiveDayData = async (data) => {
       return summaryDescription;
     };
 
-    dividedDayData.push({
+    return {
       avgTemp: getAvgTemp(),
       iconSummary: getSummaryIcon(),
       weatherSummary: getSummaryWeatherDescription(),
       dayName: getDayName(),
-    });
+    };
   };
 
+  // Iterate through each day to colate all summary data
   for (let i = 1; i <= 5; i++) {
-    processDayData(i);
-    // dividedDayData.push(processedDayData);
+    dividedDayData.push(processDayData(i));
   }
 
   return dividedDayData;
 };
 
+// Update HTML with data given in the form returned by the processFiveDayData function
 const addFiveDay = (summaryData) => {
   const fiveDaySection = document.querySelector(".forecast-5-day");
   fiveDaySection.replaceChildren();
